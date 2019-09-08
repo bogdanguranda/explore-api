@@ -1,26 +1,33 @@
 package com.bogdanguranda.explore.model;
 
-import java.sql.Blob;
-import java.util.List;
+import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
+@Entity
 public class Planet {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+
     private String name;
-    private Blob image;
+    private String imageURL;
     private String description;
+
+    @Min(value = 1, message = "Please provide a valid status")
+    @Max(value = 4, message = "Please provide a valid status")
     private Status status;
-    private List<String> robots;
 
-    public Planet() {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn()
+    private Team team;
 
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -32,12 +39,12 @@ public class Planet {
         this.name = name;
     }
 
-    public Blob getImage() {
-        return image;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setImage(Blob image) {
-        this.image = image;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     public String getDescription() {
@@ -56,11 +63,11 @@ public class Planet {
         this.status = status;
     }
 
-    public List<String> getRobots() {
-        return robots;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setRobots(List<String> robots) {
-        this.robots = robots;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 }

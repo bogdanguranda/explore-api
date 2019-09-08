@@ -1,52 +1,68 @@
 package com.bogdanguranda.explore.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.bogdanguranda.explore.db.PlanetRepository;
 import com.bogdanguranda.explore.model.Planet;
+import com.bogdanguranda.explore.model.Status;
+import jdk.internal.joptsimple.internal.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.Arrays;
+
 @RestController
+@CrossOrigin
+@RequestMapping(path="/planets")
 public class PlanetController {
-    private static Map<String, Planet> planetsRepo = new HashMap<>();
 
-    static {
-        Planet alderaan = new Planet();
-        alderaan.setName("Alderaan");
-        planetsRepo.put(alderaan.getName(), alderaan);
+    @Autowired
+    private PlanetRepository planetRepository;
 
-        Planet gama7 = new Planet();
-        gama7.setName("Gama 7");
-        planetsRepo.put(gama7.getName(), gama7);
+    @GetMapping(value = "")
+    public Iterable<Planet> getAllPlanets() {
+        return planetRepository.findAll();
     }
 
-    @RequestMapping(value = "/planets", method = RequestMethod.POST)
-    public ResponseEntity<Object> createPlanet(@RequestBody Planet planet) {
-        planetsRepo.put(planet.getName(), planet);
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Object> getPlanet(@PathVariable("id") Integer id) {
+        Planet planet = planetRepository.findOne(id);
+        if (planet == null) {
+            return new ResponseEntity<>("Planet doesn't exist", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(planet, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "")
+    public ResponseEntity<String> createPlanet(@Valid @RequestBody Planet planet) {
+        planetRepository.save(planet);
         return new ResponseEntity<>("Planet was created successfully", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/planets")
-    public ResponseEntity<Object> getAllPlanets() {
-        return new ResponseEntity<>(planetsRepo.values(), HttpStatus.OK);
-    }
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<String> updatePlanet(@RequestBody Planet planet) {
+        Planet planetFound = planetRepository.findOne(planet.getId());
+        if (planetFound == null) {
+            return new ResponseEntity<>("Planet doesn't exist", HttpStatus.NOT_FOUND);
+        }
 
-    @RequestMapping(value = "/planets/{name}")
-    public ResponseEntity<Object> getPlanet(@PathVariable("name") String name) {
-        return new ResponseEntity<>(planetsRepo.get(name), HttpStatus.OK);
-    }
+        if (Arrays.binarySearch(Status.values(), planet.getStatus()) >= 0) {
+            planetFound.setStatus(planet.getStatus());
+        }
 
-    @RequestMapping(value = "/planets/{name}", method = RequestMethod.PUT)
-    public ResponseEntity<Object> updatePlanet(@PathVariable("name") String name, @RequestBody Planet planet) {
-        planetsRepo.put(name, planet);
+        if (!Strings.isNullOrEmpty(planet.getDescription())) {
+            planetFound.setDescription(planet.getDescription());
+        }
+
+        planetRepository.save(planetFound);
+
         return new ResponseEntity<>("Planet was updated successfully", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/planets/{name}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> deletePlanet(@PathVariable("name") String name) {
-        planetsRepo.remove(name);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<String> deletePlanet(@PathVariable("id") Integer id) {
+        planetRepository.delete(id);
         return new ResponseEntity<>("Planet was deleted successfully", HttpStatus.OK);
     }
 }
