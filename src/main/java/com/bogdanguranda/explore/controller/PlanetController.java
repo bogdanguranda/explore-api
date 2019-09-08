@@ -3,10 +3,10 @@ package com.bogdanguranda.explore.controller;
 import com.bogdanguranda.explore.db.PlanetRepository;
 import com.bogdanguranda.explore.model.Planet;
 import com.bogdanguranda.explore.model.Status;
-import jdk.internal.joptsimple.internal.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,7 +51,7 @@ public class PlanetController {
             planetFound.setStatus(planet.getStatus());
         }
 
-        if (!Strings.isNullOrEmpty(planet.getDescription())) {
+        if (!StringUtils.isEmpty(planet.getDescription())) {
             planetFound.setDescription(planet.getDescription());
         }
 
