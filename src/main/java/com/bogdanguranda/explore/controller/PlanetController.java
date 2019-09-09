@@ -41,8 +41,8 @@ public class PlanetController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<String> updatePlanet(@RequestBody Planet planet) {
-        Planet planetFound = planetRepository.findOne(planet.getId());
+    public ResponseEntity<String> updatePlanet(@PathVariable("id") Integer id, @RequestBody Planet planet) {
+        Planet planetFound = planetRepository.findOne(id);
         if (planetFound == null) {
             return new ResponseEntity<>("Planet doesn't exist", HttpStatus.NOT_FOUND);
         }

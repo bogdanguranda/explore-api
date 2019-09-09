@@ -1,8 +1,6 @@
 package com.bogdanguranda.explore.model;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 @Entity
 public class Planet {
@@ -14,9 +12,6 @@ public class Planet {
     private String name;
     private String imageURL;
     private String description;
-
-    @Min(value = 1, message = "Please provide a valid status")
-    @Max(value = 4, message = "Please provide a valid status")
     private Status status;
 
     @OneToOne(cascade = CascadeType.ALL)
